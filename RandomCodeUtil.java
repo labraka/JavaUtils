@@ -134,4 +134,87 @@ public class RandomCodeUtil {
 
         return s;
     }
+
+    /**
+     * 根据当前时间增加指定类型和数量的日期
+     * @param date
+     * @param type
+     * @param num
+     * @return
+     */
+    public static Date addDate(Date date, int type, int num){
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        calendar.add(type, num);
+        date = calendar.getTime();
+        return date;
+    }
+
+    /**
+     *获取相差的天数
+     * @param begin
+     * @param end
+     * @return
+     */
+    public static long getBetweenDays(Date begin, Date end){
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(begin);
+        long timeInMillis1 = calendar.getTimeInMillis();
+        calendar.setTime(end);
+        long timeInMillis2 = calendar.getTimeInMillis();
+        long betweenDays =  (timeInMillis2 - timeInMillis1) / (1000L*3600L*24L);
+        return betweenDays;
+    }
+
+    /**
+     * 通过特殊的大小写生成指定长度的随机码
+     * @param length
+     * @param numSize
+     * @param merchantIntegre
+     * @return
+     */
+    public static HashSet<String> getCharAndNumr(int length, int numSize, HashSet<String> merchantIntegre) {
+        //第一层循环用于生成积分券个数，第二层用于组合积分码
+        for (int j = 0; j < numSize; j++) {
+
+            String val = new String("");
+            Random random = new Random();
+
+            //积分码生成
+            for (int i = 0; i < length; i++) {
+                // 输出字母还是数字
+                String charOrNum = random.nextInt(2) % 2 == 0 ? "char" : "num";
+                // 字符串
+                if ("char".equalsIgnoreCase(charOrNum)) {
+                    // 取得大写字母还是小写字母
+                    int choice = random.nextInt(2) % 2 == 0 ? 65 : 97;
+                    val += (char) (choice + random.nextInt(26));
+                } else if ("num".equalsIgnoreCase(charOrNum)) { // 数字
+                    val += String.valueOf(random.nextInt(10));
+                }
+            }
+            val.toUpperCase();
+            merchantIntegre.add(val);
+        }
+
+        // 首次循环完成，可能有重复值，生成的字符串总数小于原有，递归循环再次生成。
+        while (merchantIntegre.size() < numSize) {
+            numSize = numSize - merchantIntegre.size();
+            // 继续循环生成
+            getCharAndNumr(length, numSize, merchantIntegre);
+
+        }
+        return merchantIntegre;
+    }
+
+    /**
+     * 将价格格式化显示
+     * @param price
+     * @return
+     */
+    public static String formatPrice(BigDecimal price){
+        DecimalFormat decimalFormat=new DecimalFormat("###.###");
+        String s = decimalFormat.format(price);
+        return s;
+    }
 }
